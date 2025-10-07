@@ -13,17 +13,16 @@ M = 1;
 m = 0.1;
 
 % define V & F
-V = @(x,y) - G*m*M * (x^2 + y^2)^(-1/2);
+V = @(x,y) G*m*M * (x^2 + y^2)^(-1/2);
 Fx = @(x,y) - G*m*M * x * (x^2 + y^2)^(-3/2);
-Fy = @(x,y) - G*m*M * y * (x^2 + y^2)^(-3/2);
 
 % define p & q
-p(1,:) = [0 0];
-q(1,:) = [10 10];
+p(1) = 0.2;
+q(1) = 0.5;
 t(1) = 0;
 
 % define Hamiltonian
-H(1) = dot(p,p)/(2*m) + V(q(1,1), q(1,2));
+H(1) = p(1) * p(1)/(2*m) + V(q(1));
 
 %% euler-cromer iteration
 for i=1:nstep
