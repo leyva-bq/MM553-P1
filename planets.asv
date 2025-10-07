@@ -13,22 +13,24 @@ M = 1;
 m = 0.1;
 
 % define V & F
-V = @(x,y) G*m*M * (x^2 + y^2)^(-1/2);
+V = @(x,y) - G*m*M * (x^2 + y^2)^(-1/2);
 Fx = @(x,y) - G*m*M * x * (x^2 + y^2)^(-3/2);
+Fy = @(x,y) - G*m*M * y * (x^2 + y^2)^(-3/2);
 
 % define p & q
-p(1) = 0.2;
-q(1) = 0.5;
+p(1,:) = [0 0];
+q(1,:) = [10 10];
 t(1) = 0;
 
 % define Hamiltonian
-H(1) = p(1) * p(1)/(2*m) + V(q(1));
+H(1) = dot(p,p)/(2*m) + V(q(1,1), q(1,2));
 
 %% euler-cromer iteration
 for i=1:nstep
-    p(i+1) = p(i) - k*q(i) * e;
-    q(i+1) = q(i) + e * p(i+1)/m; % this p(i+1) change is euler vs euler-cromer
-    H(i+1) = p(i+1) * p(i+1) / (2*m) + V(q(i+1));
+    p(i+1,1) = p(i,1) + e .* Fx(q(i,1), q(i,2)); % Px
+    p(i+1,2) = p(i,2) + e .* Fy(p(i,1), p(i,2)); % Px
+    q(i+1,:) = q(i,:) + e * p(i+1,:)/m; % this p(i+1) change is euler vs euler-cromer
+    H(i+1,:) = p(i+1,:) * p(i+1,:) / (2*m) + V(q(i+1));
     t(i+1) = t(i) + e;
 end
 
