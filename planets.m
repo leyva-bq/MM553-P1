@@ -8,9 +8,9 @@ tf = 10;
 nstep = tf/e;
 
 % define constants
-G = 1e-5;
-M = 100;
-m = 0.1;
+G = 2;
+M = 1;
+m = 1e-1;
 
 % define V & F
 V = @(x,y) - G*m*M * (x^2 + y^2)^(-1/2);
@@ -18,8 +18,8 @@ Fx = @(x,y) - G*m*M * x * (x^2 + y^2)^(-3/2);
 Fy = @(x,y) - G*m*M * y * (x^2 + y^2)^(-3/2);
 
 % define p & q
-p(1,:) = [-1 -2];
-q(1,:) = [10 11];
+p(1,:) = [0 -0.1];
+q(1,:) = [1 1];
 t(1) = 0;
 
 % define Hamiltonian
@@ -81,10 +81,10 @@ pause;
 %% SIMULATION
 for i=1:nstep
     %hold on
-    p = plot(q(i,1), q(i,2), 'o', 0,0,'o');
+    p = plot(RK2_q(i,1), RK2_q(i,2), 'o', 0,0,'o');
     p(2).MarkerSize = 10;
-    xlim([-15 15]);
-    ylim([-15 15]);
+    xlim([-5 5]);
+    ylim([-5 5]);
     pause(0.01);
     %hold off
 end
