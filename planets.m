@@ -88,8 +88,8 @@ pause;
 plot(RK2_t, RK2_H(:,1), 'x-', t, H(:,1), '.-')
 title('Hamiltonian (H vs t)');
 legend('RK2', 'EC');
-xlabel('H');
-ylabel('t');
+xlabel('t');
+ylabel('H');
 pause;
 
 %% SIMULATION
