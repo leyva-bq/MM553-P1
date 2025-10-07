@@ -8,8 +8,8 @@ tf = 10;
 nstep = tf/e;
 
 % define constants
-G = 2;
-M = 1;
+G = 3;
+M = 10;
 m = 1e-1;
 
 % define V & F
@@ -18,7 +18,7 @@ Fx = @(x,y) - G*m*M * x * (x^2 + y^2)^(-3/2);
 Fy = @(x,y) - G*m*M * y * (x^2 + y^2)^(-3/2);
 
 % define p & q
-p(1,:) = [0 -0.1];
+p(1,:) = [0 -0.5];
 q(1,:) = [1 1];
 t(1) = 0;
 
@@ -66,25 +66,37 @@ end
 
 %% PLOTS
 plot3(RK2_p(:,1), RK2_p(:,2), RK2_t, 'x-', p(:,1), p(:,2), t, '.-')
-title('Momentum (p vs t)')
+title('Momentum (p vs t)');
+legend('RK2', 'EC');
+xlabel('p_x');
+ylabel('p_y');
+zlabel('t');
 pause;
-plot3(RK2_q(:,1), RK2_q(:,2), RK2_t, 'x-', q(:,1), q(:,2), t, '.-')
-title('Position (q vs t)')
+plot(RK2_q(:,1), RK2_q(:,2), 'x-', q(:,1), q(:,2), '.-')
+title('Position (q vs t)');
+legend('RK2', 'EC');
+xlabel('q_x');
+ylabel('q_y');
+zlabel('t');
 pause;
-%plot3(RK2_p(:,1), RK2_p(:,2), RK2_t, '.', p(:,1), p(:,2), t, '.')
-title('Phase space diagram(p vs q)')
+plot3(RK2_p(:,1), RK2_q(:,1), RK2_t, '.', p(:,1), q(:,1), t, '.')
+title('Phase space diagram(px vs qx)');
+legend('RK2', 'EC');
+xlabel('px');
+ylabel('qy');
 pause;
 plot(RK2_t, RK2_H(:,1), 'x-', t, H(:,1), '.-')
-title('Hamiltonian (H vs t)')
+title('Hamiltonian (H vs t)');
+legend('RK2', 'EC');
+xlabel('H');
+ylabel('t');
 pause;
 
 %% SIMULATION
 for i=1:nstep
-    %hold on
     p = plot(RK2_q(i,1), RK2_q(i,2), 'o', 0,0,'o');
     p(2).MarkerSize = 10;
-    xlim([-5 5]);
-    ylim([-5 5]);
+    xlim([-3 3]);
+    ylim([-3 3]);
     pause(0.01);
-    %hold off
 end
