@@ -18,7 +18,7 @@ Fx = @(x,y) - G*m*M * x * (x^2 + y^2)^(-3/2);
 Fy = @(x,y) - G*m*M * y * (x^2 + y^2)^(-3/2);
 
 % define p & q
-p(1,:) = [1 1];
+p(1,:) = [1 -1];
 q(1,:) = [10 11];
 t(1) = 0;
 
@@ -59,10 +59,24 @@ end
 
 %% PLOTS
 plot(RK2_t, RK2_p, 'x', t, p, '.');
+title('Momentum (p vs t)')
 pause;
 plot(RK2_t, RK2_q, 'x', t, q, '.');
+title('Position (q vs t)')
 pause;
 plot(RK2_p, RK2_q, 'x', p, q, '.');
+title('Phase diagram(p vs q)')
 pause;
 plot(RK2_t, RK2_H, 'x', t, H, '.');
+title('Hamiltonian (H vs t)')
 pause;
+
+%% SIMULATION
+for i=1:nstep
+    %hold on
+    scatter(q(i,1), q(i,2));
+    xlim([-15 15]);
+    ylim([-15 15]);
+    pause(0.01);
+    %hold off
+end
