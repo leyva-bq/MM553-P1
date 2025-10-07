@@ -8,8 +8,8 @@ tf = 10;
 nstep = tf/e;
 
 % define constants
-G = 1;
-M = 1;
+G = 1e-5;
+M = 100;
 m = 0.1;
 
 % define V & F
@@ -18,7 +18,7 @@ Fx = @(x,y) - G*m*M * x * (x^2 + y^2)^(-3/2);
 Fy = @(x,y) - G*m*M * y * (x^2 + y^2)^(-3/2);
 
 % define p & q
-p(1,:) = [-1 -1];
+p(1,:) = [-1 -2];
 q(1,:) = [10 11];
 t(1) = 0;
 
