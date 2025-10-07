@@ -65,23 +65,24 @@ for i=1:nstep
 end
 
 %% PLOTS
-plot(RK2_t, RK2_p, 'x', t, p, '.');
+plot3(RK2_p(:,1), RK2_p(:,2), RK2_t, 'x-', p(:,1), p(:,2), t, '.-')
 title('Momentum (p vs t)')
 pause;
-plot(RK2_t, RK2_q, 'x', t, q, '.');
+plot3(RK2_q(:,1), RK2_q(:,2), RK2_t, 'x-', q(:,1), q(:,2), t, '.-')
 title('Position (q vs t)')
 pause;
-plot(RK2_p, RK2_q, 'x', p, q, '.');
-title('Phase diagram(p vs q)')
+%plot3(RK2_p(:,1), RK2_p(:,2), RK2_t, '.', p(:,1), p(:,2), t, '.')
+title('Phase space diagram(p vs q)')
 pause;
-plot(RK2_t, RK2_H, 'x', t, H, '.');
+plot(RK2_t, RK2_H(:,1), 'x-', t, H(:,1), '.-')
 title('Hamiltonian (H vs t)')
 pause;
 
 %% SIMULATION
 for i=1:nstep
     %hold on
-    scatter(q(i,1), q(i,2));
+    p = plot(q(i,1), q(i,2), 'o', 0,0,'o');
+    p(2).MarkerSize = 10;
     xlim([-15 15]);
     ylim([-15 15]);
     pause(0.01);
