@@ -18,7 +18,7 @@ Fx = @(x,y) - G*m*M * x * (x^2 + y^2)^(-3/2);
 Fy = @(x,y) - G*m*M * y * (x^2 + y^2)^(-3/2);
 
 % define p & q
-p(1,:) = [1 -1];
+p(1,:) = [-1 -1];
 q(1,:) = [10 11];
 t(1) = 0;
 
@@ -35,25 +35,32 @@ for i=1:nstep
 end
 
 %% RK2
-RK2_p(1) = p(1);
-RK2_q(1) = q(1);
-RK2_H(1) = H(1);
+RK2_p(1,:) = p(1,:);
+RK2_q(1,:) = q(1,:);
+RK2_H(1,:) = H(1,:);
 RK2_t(1) = t(1);
 
 for i=1:nstep
-    RK2_k1_q = RK2_p(i)/m;
-    RK2_k1_p = F(RK2_q(i));
+    % k1
+    RK2_k1_q(i,:) = RK2_p(i,:)/m;
+    RK2_k1_p(i,1) = Fx(RK2_q(i,1), RK2_q(i,2)); % Px
+    RK2_k1_p(i,2) = Fy(RK2_q(i,1), RK2_q(i,2)); % Py
 
-    RK2_q_mid = RK2_q(i) + e * 0.5 * RK2_k1_q;
-    RK2_p_mid = RK2_p(i) + e * 0.5 * RK2_k1_p;
+    % mid for k2
+    RK2_q_mid(i,:) = RK2_q(i,:) + e * 0.5 * RK2_k1_q(i,:);
+    RK2_p_mid(i,:) = RK2_p(i,:) + e * 0.5 * RK2_k1_p(i,:);
 
-    RK2_k2_q = RK2_p_mid / m;
-    RK2_k2_p = F(RK2_q_mid);
+    % k2
+    RK2_k2_q(i,:) = RK2_p_mid(i,:)/m;
+    RK2_k2_p(i,1) = Fx(RK2_q_mid(i,1), RK2_q_mid(i,2)); % Px
+    RK2_k2_p(i,2) = Fy(RK2_q_mid(i,1), RK2_q_mid(i,2)); % Py
 
-    RK2_p(i+1) = RK2_p(i) + e * RK2_k2_p;
-    RK2_q(i+1) = RK2_q(i) + e * RK2_k2_q;
+    %
+    RK2_p(i+1,:) = RK2_p(i,:) + e * RK2_k2_p(i,:);
+    RK2_q(i+1,:) = RK2_q(i,:) + e * RK2_k2_q(i,:);
     
-    RK2_H(i+1) = RK2_p(i+1) * RK2_p(i+1) / (2*m) + V(RK2_q(i+1));
+    RK2_H(i+1,:) = dot(RK2_p(i,:), RK2_p(i,:)) / (2*m) +...
+                   V(RK2_q(i+1,1), RK2_q(i+1,2));
     RK2_t(i+1) = RK2_t(i) + e;
 end
 
