@@ -1,7 +1,7 @@
 clc; clear;
 
 % define epsilon and t final 
-e = 1e-2;
+e = 1e-3;
 tf = 10;
 
 % calculate num of steps
@@ -98,5 +98,5 @@ for i=1:nstep
     p(2).MarkerSize = 10;
     xlim([-3 3]);
     ylim([-3 3]);
-    pause(0.01);
+    pause(e);
 end
