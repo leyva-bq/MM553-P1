@@ -10,20 +10,27 @@ nstep = tf/e;
 % define constants
 G = 3;
 M = 10;
-m = 1e-1;
+m = [1e-1 0.5e-1];
 
 % define V & F
 V = @(x,y) - G*m*M * (x^2 + y^2)^(-1/2);
 Fx = @(x,y) - G*m*M * x * (x^2 + y^2)^(-3/2);
 Fy = @(x,y) - G*m*M * y * (x^2 + y^2)^(-3/2);
 
-% define p & q
-p(1,:) = [0 -1];
-q(1,:) = [1 1];
+% define p(t, n, p_n) & q(t, n, q_n)
+p(1,1,:) = [0 -1];
+p(1,2,:) = [0 1];
+q(1,1,:) = [1 1];
+q(1,2,:) = [-1 -1];
 t(1) = 0;
 
 % define Hamiltonian
-H(1) = dot(p,p)/(2*m) + V(q(1,1), q(1,2));
+p1 = squeeze(p(1,1,:))';
+p2 = squeeze(p(1,2,:))';
+q1 = squeeze(q(1,1,:))';
+q2 = squeeze(q(1,2,:))';
+H(1,:) = dot(p1,p1)/(2*m(1)) + V(q1(1), q1(2)) +...
+         dot(p2,p2)/(2*m(2)) + V(q2(1), q2(2));
 
 %% euler-cromer iteration
 for i=1:nstep
