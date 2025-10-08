@@ -2,7 +2,7 @@ clc; clear;
 
 % define epsilon and t final 
 e = 1e-3;
-tf = 10;
+tf = 3;
 
 % calculate num of steps
 nstep = tf/e;
@@ -18,7 +18,7 @@ Fx = @(x,y) - G*m*M * x * (x^2 + y^2)^(-3/2);
 Fy = @(x,y) - G*m*M * y * (x^2 + y^2)^(-3/2);
 
 % define p & q
-p(1,:) = [0 -0.5];
+p(1,:) = [0 -1];
 q(1,:) = [1 1];
 t(1) = 0;
 
@@ -73,7 +73,7 @@ ylabel('p_y');
 zlabel('t');
 pause;
 plot(RK2_q(:,1), RK2_q(:,2), 'x-', q(:,1), q(:,2), '.-')
-title('Position (q vs t)');
+title('Position (qx vs qy)');
 legend('RK2', 'EC');
 xlabel('q_x');
 ylabel('q_y');
