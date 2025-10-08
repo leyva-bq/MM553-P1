@@ -13,9 +13,9 @@ M = 10;
 m = [1e-1 0.5e-1];
 
 % define V & F
-V = @(x,y) - G*m*M * (x^2 + y^2)^(-1/2);
-Fx = @(x,y) - G*m*M * x * (x^2 + y^2)^(-3/2);
-Fy = @(x,y) - G*m*M * y * (x^2 + y^2)^(-3/2);
+V = @(x,y,m) - G*m*M * (x^2 + y^2)^(-1/2);
+Fx = @(x,y,m) - G*m*M * x * (x^2 + y^2)^(-3/2);
+Fy = @(x,y,m) - G*m*M * y * (x^2 + y^2)^(-3/2);
 
 % define p(t, n, p_n) & q(t, n, q_n)
 p(1,1,:) = [0 -1];
@@ -29,21 +29,31 @@ p1 = squeeze(p(1,1,:))';
 p2 = squeeze(p(1,2,:))';
 q1 = squeeze(q(1,1,:))';
 q2 = squeeze(q(1,2,:))';
-H(1,:) = dot(p1,p1)/(2*m(1)) + V(q1(1), q1(2)) +...
-         dot(p2,p2)/(2*m(2)) + V(q2(1), q2(2));
+H(1,:) = dot(p1,p1)/(2*m(1)) + V(q1(1), q1(2), m(1)) +...
+         dot(p2,p2)/(2*m(2)) + V(q2(1), q2(2), m(2));
 
 %% euler-cromer iteration
-for i=1:nstep
-    p(i+1,1) = p(i,1) + e * Fx(q(i,1), q(i,2)); % Px
-    p(i+1,2) = p(i,2) + e * Fy(q(i,1), q(i,2)); % Py
-    q(i+1,:) = q(i,:) + e * p(i+1,:)/m; % Q
-    H(i+1,:) = dot(p(i,:),p(i,:))/(2*m) + V(q(i,1), q(i,2));
-    t(i+1) = t(i) + e;
+for n=1:2
+    for i=1:nstep
+        pn = squeeze(p(i,n,:))';
+        px = pn(1); py = pn(2);
+        qn = squeeze(q(i,n,:))';
+        qx = qn(1); qy = qn(2);
+
+        p(i+1,n,1) = px + e * Fx(qx, qy, m(n)); % Px
+        p(i+1,n,2) = py + e * Fy(qx, qy, m(n)); % Py
+        pn1 = squeeze(p(i+1,n,:))';
+        q(i+1,n,:) = qn + e * pn1/m(n); % Q
+        H(i+1,:) = H(i,:) + dot(pn,pn)/(2*m(n)) + V(qx, qy, m(n));
+        if n==1
+            t(i+1) = t(i) + e;
+        end
+    end
 end
 
 %% RK2
-RK2_p(1,:) = p(1,:);
-RK2_q(1,:) = q(1,:);
+RK2_p(1,:,:) = p(1,:,:);
+RK2_q(1,:,:) = q(1,:,:);
 RK2_H(1,:) = H(1,:);
 RK2_t(1) = t(1);
 
@@ -72,7 +82,9 @@ for i=1:nstep
 end
 
 %% PLOTS
-plot3(RK2_p(:,1), RK2_p(:,2), RK2_t, 'x-', p(:,1), p(:,2), t, '.-')
+plot3(RK2_p(:,1), RK2_p(:,2), RK2_t, 'x-',...
+      p(:,1,1), p(:,1,2), t, '.-',...
+      p(:,2,1), p(:,2,2), t, '.-');
 title('Momentum (p vs t)');
 legend('RK2', 'EC');
 xlabel('p_x');

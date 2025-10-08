@@ -1,8 +1,8 @@
 clc; clear;
 
 % define epsilon and t final 
-e = 1e-2;
-tf = 10;
+e = 1e-3;
+tf = 3;
 
 % calculate num of steps
 nstep = tf/e;
@@ -10,28 +10,42 @@ nstep = tf/e;
 % define constants
 G = 3;
 M = 10;
-m = 1e-1;
+m = [1e-1 0.5e-1];
 
 % define V & F
-V = @(x,y) - G*m*M * (x^2 + y^2)^(-1/2);
-Fx = @(x,y) - G*m*M * x * (x^2 + y^2)^(-3/2);
-Fy = @(x,y) - G*m*M * y * (x^2 + y^2)^(-3/2);
+V = @(x,y,m) - G*m*M * (x^2 + y^2)^(-1/2);
+Fx = @(x,y,m) - G*m*M * x * (x^2 + y^2)^(-3/2);
+Fy = @(x,y,m) - G*m*M * y * (x^2 + y^2)^(-3/2);
 
-% define p & q
-p(1,:) = [0 -0.7e-1];
-q(1,:) = [1 1];
+% define p(t, n, p_n) & q(t, n, q_n)
+p(1,1,:) = [0 -1];
+p(1,2,:) = [0 1];
+q(1,1,:) = [1 1];
+q(1,2,:) = [-1 -1];
 t(1) = 0;
 
 % define Hamiltonian
-H(1) = dot(p,p)/(2*m) + V(q(1,1), q(1,2));
+p1 = squeeze(p(1,1,:))';
+p2 = squeeze(p(1,2,:))';
+q1 = squeeze(q(1,1,:))';
+q2 = squeeze(q(1,2,:))';
+H(1,:) = dot(p1,p1)/(2*m(1)) + V(q1(1), q1(2), m(1)) +...
+         dot(p2,p2)/(2*m(2)) + V(q2(1), q2(2), m(2));
 
 %% euler-cromer iteration
-for i=1:nstep
-    p(i+1,1) = p(i,1) + e * Fx(q(i,1), q(i,2)); % Px
-    p(i+1,2) = p(i,2) + e * Fy(q(i,1), q(i,2)); % Py
-    q(i+1,:) = q(i,:) + e * p(i+1,:)/m; % Q
-    H(i+1,:) = dot(p(i,:),p(i,:))/(2*m) + V(q(i,1), q(i,2));
-    t(i+1) = t(i) + e;
+for n=1:2
+    for i=1:nstep
+        px = squeeze(p(i,n,1))';
+        py = squeeze(p(i,n,2))';
+        qx = squeeze(q(i,n,1))';
+        qy = squeeze(q(i,n,2))';
+
+        p(i+1,n,1) = px + e * Fx(qx, qy); % Px
+        p(i+1,n,2) = py + e * Fy(qx, qy); % Py
+        q(i+1,n,:) = q(i,:) + e * p(i+1,:)/m; % Q
+        H(i+1,:) = dot(p(i,:),p(i,:))/(2*m) + V(q(i,1), q(i,2));
+        t(i+1) = t(i) + e;
+    end
 end
 
 %% RK2
@@ -66,16 +80,30 @@ end
 
 %% PLOTS
 plot3(RK2_p(:,1), RK2_p(:,2), RK2_t, 'x-', p(:,1), p(:,2), t, '.-')
-title('Momentum (p vs t)')
+title('Momentum (p vs t)');
+legend('RK2', 'EC');
+xlabel('p_x');
+ylabel('p_y');
+zlabel('t');
 pause;
-plot3(RK2_q(:,1), RK2_q(:,2), RK2_t, 'x-', q(:,1), q(:,2), t, '.-')
-title('Position (q vs t)')
+plot(RK2_q(:,1), RK2_q(:,2), 'x-', q(:,1), q(:,2), '.-')
+title('Position (qx vs qy)');
+legend('RK2', 'EC');
+xlabel('q_x');
+ylabel('q_y');
+zlabel('t');
 pause;
-%plot3(RK2_p(:,1), RK2_p(:,2), RK2_t, '.', p(:,1), p(:,2), t, '.')
-title('Phase space diagram(p vs q)')
+plot3(RK2_p(:,1), RK2_q(:,1), RK2_t, '.', p(:,1), q(:,1), t, '.')
+title('Phase space diagram(px vs qx)');
+legend('RK2', 'EC');
+xlabel('px');
+ylabel('qy');
 pause;
 plot(RK2_t, RK2_H(:,1), 'x-', t, H(:,1), '.-')
-title('Hamiltonian (H vs t)')
+title('Hamiltonian (H vs t)');
+legend('RK2', 'EC');
+xlabel('t');
+ylabel('H');
 pause;
 
 %% SIMULATION
@@ -84,5 +112,5 @@ for i=1:nstep
     p(2).MarkerSize = 10;
     xlim([-3 3]);
     ylim([-3 3]);
-    pause(0.01);
+    pause(e);
 end
