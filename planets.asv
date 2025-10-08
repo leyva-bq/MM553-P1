@@ -9,8 +9,8 @@ nstep = tf/e;
 
 % define constants
 G = 3;
-M = 10;
-m = [1e-1 0.5e-1];
+M = 30;
+m = [1.3e-1 1.3e-1];
 
 % define V & F
 V = @(x,y,m) - G*m*M * (x^2 + y^2)^(-1/2);
@@ -35,71 +35,100 @@ H(1,:) = dot(p1,p1)/(2*m(1)) + V(q1(1), q1(2), m(1)) +...
 %% euler-cromer iteration
 for n=1:2
     for i=1:nstep
-        px = squeeze(p(i,n,1))';
-        py = squeeze(p(i,n,2))';
-        qx = squeeze(q(i,n,1))';
-        qy = squeeze(q(i,n,2))';
+        pn = squeeze(p(i,n,:))';
+        px = pn(1); py = pn(2);
+        qn = squeeze(q(i,n,:))';
+        qx = qn(1); qy = qn(2);
 
-        p(i+1,n,1) = px + e * Fx(qx, qy); % Px
-        p(i+1,n,2) = py + e * Fy(qx, qy); % Py
-        q(i+1,n,:) = q(i,:) + e * p(i+1,:)/m; % Q
-        H(i+1,:) = dot(p(i,:),p(i,:))/(2*m) + V(q(i,1), q(i,2));
-        t(i+1) = t(i) + e;
+        p(i+1,n,1) = px + e * Fx(qx, qy, m(n)); % Px
+        p(i+1,n,2) = py + e * Fy(qx, qy, m(n)); % Py
+        pn1 = squeeze(p(i+1,n,:))';
+        q(i+1,n,:) = qn + e * pn1/m(n); % Q
+        if n==1
+            H(i+1,:) = dot(pn,pn)/(2*m(n)) + V(qx, qy, m(n));
+            t(i+1) = t(i) + e;
+        else
+            H(i+1,:) = H(i+1,:) + dot(pn,pn)/(2*m(n)) + V(qx, qy, m(n));
+        end
     end
 end
 
 %% RK2
-RK2_p(1,:) = p(1,:);
-RK2_q(1,:) = q(1,:);
+RK2_p(1,:,:) = p(1,:,:);
+RK2_q(1,:,:) = q(1,:,:);
 RK2_H(1,:) = H(1,:);
 RK2_t(1) = t(1);
 
-for i=1:nstep
-    % k1
-    RK2_k1_q(i,:) = RK2_p(i,:)/m;
-    RK2_k1_p(i,1) = Fx(RK2_q(i,1), RK2_q(i,2)); % Px
-    RK2_k1_p(i,2) = Fy(RK2_q(i,1), RK2_q(i,2)); % Py
+for n=1:2
+    for i=1:nstep
+        pn = squeeze(RK2_p(i,n,:))';
+        px = pn(1); py = pn(2);
+        qn = squeeze(RK2_q(i,n,:))';
+        qx = qn(1); qy = qn(2);
 
-    % mid for k2
-    RK2_q_mid(i,:) = RK2_q(i,:) + e * 0.5 * RK2_k1_q(i,:);
-    RK2_p_mid(i,:) = RK2_p(i,:) + e * 0.5 * RK2_k1_p(i,:);
-
-    % k2
-    RK2_k2_q(i,:) = RK2_p_mid(i,:)/m;
-    RK2_k2_p(i,1) = Fx(RK2_q_mid(i,1), RK2_q_mid(i,2)); % Px
-    RK2_k2_p(i,2) = Fy(RK2_q_mid(i,1), RK2_q_mid(i,2)); % Py
-
-    %
-    RK2_p(i+1,:) = RK2_p(i,:) + e * RK2_k2_p(i,:);
-    RK2_q(i+1,:) = RK2_q(i,:) + e * RK2_k2_q(i,:);
+        % k1
+        RK2_k1_q(i,:) = pn/m(n);
+        RK2_k1_p(i,1) = Fx(qx, qy, m(n)); % Px
+        RK2_k1_p(i,2) = Fy(qx, qy, m(n)); % Py
     
-    RK2_H(i+1,:) = dot(RK2_p(i,:), RK2_p(i,:)) / (2*m) +...
-                   V(RK2_q(i+1,1), RK2_q(i+1,2));
-    RK2_t(i+1) = RK2_t(i) + e;
+        % mid for k2
+        RK2_q_mid(i,:) = qn + e * 0.5 * RK2_k1_q(i,:);
+        RK2_p_mid(i,:) = pn + e * 0.5 * RK2_k1_p(i,:);
+    
+        % k2
+        RK2_k2_q(i,:) = RK2_p_mid(i,:)/m(n);
+        RK2_k2_p(i,1) = Fx(RK2_q_mid(i,1), RK2_q_mid(i,2), m(n)); % Px
+        RK2_k2_p(i,2) = Fy(RK2_q_mid(i,1), RK2_q_mid(i,2), m(n)); % Py
+    
+        %
+        RK2_p(i+1,n,:) = pn + e * RK2_k2_p(i,:);
+        RK2_q(i+1,n,:) = qn + e * RK2_k2_q(i,:);
+        
+        RK2_H(i+1,:) = RK2_H(i,:) + dot(pn,pn) / (2*m(n)) + V(qx, qy, m(n));
+        if n==1
+            RK2_t(i+1) = RK2_t(i) + e;
+        end
+    end
 end
 
 %% PLOTS
-plot3(RK2_p(:,1), RK2_p(:,2), RK2_t, 'x-', p(:,1), p(:,2), t, '.-')
+plot3(RK2_p(:,1,1), RK2_p(:,1,2), RK2_t, 'x-',...
+      RK2_p(:,2,1), RK2_p(:,2,2), RK2_t, 'x-',...
+      p(:,1,1), p(:,1,2), t, '.-',...
+      p(:,2,1), p(:,2,2), t, '.-');
 title('Momentum (p vs t)');
-legend('RK2', 'EC');
+legend('P1 - RK2', 'P2 - RK2', ...
+       'P1 - EC', 'P2 - EC');
 xlabel('p_x');
 ylabel('p_y');
 zlabel('t');
 pause;
-plot(RK2_q(:,1), RK2_q(:,2), 'x-', q(:,1), q(:,2), '.-')
+
+plot3(RK2_q(:,1,1), RK2_q(:,1,2), RK2_t, 'x-',...
+      RK2_q(:,2,1), RK2_q(:,2,2), RK2_t, 'x-',...
+      p(:,1,1), p(:,1,2), t, '.-',...
+      p(:,2,1), p(:,2,2), t, '.-');
 title('Position (qx vs qy)');
-legend('RK2', 'EC');
+legend('P1 - RK2', 'P2 - RK2', ...
+       'P1 - EC', 'P2 - EC');
 xlabel('q_x');
 ylabel('q_y');
 zlabel('t');
 pause;
-plot3(RK2_p(:,1), RK2_q(:,1), RK2_t, '.', p(:,1), q(:,1), t, '.')
+
+plot3(RK2_p(:,1,1), RK2_q(:,1,1), RK2_t, 'x-',...
+      RK2_p(:,2,1), RK2_q(:,2,1), RK2_t, 'x-',...
+      p(:,1,1), q(:,1,1), t, '.-',...
+      p(:,2,1), q(:,2,1), t, '.-');
 title('Phase space diagram(px vs qx)');
-legend('RK2', 'EC');
+legend('P1 - RK2', 'P2 - RK2', ...
+       'P1 - EC', 'P2 - EC');
 xlabel('px');
 ylabel('qy');
 pause;
-plot(RK2_t, RK2_H(:,1), 'x-', t, H(:,1), '.-')
+
+plot(RK2_t, RK2_H(:,1), 'x-', ...
+     t, H(:,1), '.-');
 title('Hamiltonian (H vs t)');
 legend('RK2', 'EC');
 xlabel('t');
@@ -107,9 +136,30 @@ ylabel('H');
 pause;
 
 %% SIMULATION
-for i=1:nstep
-    p = plot(RK2_q(i,1), RK2_q(i,2), 'o', 0,0,'o');
+trail = 100;
+for i=1:5:nstep
+    p = plot(q(i,1,1), q(i,1,2), 'o', ...
+             q(i,2,1), q(i,2,2), 'o', ...
+             0,0,'o',...
+             q(1:i,1,1), q(1:i,1,2), '-',...
+             q(1:i,2,1), q(1:i,2,2), '-');
+
+    % PLANET 1
+    p(1).MarkerSize = 10;
+    p(1).MarkerFaceColor = 'red';
+    p(4).Color = [0.5 0 0];
+
+    % PLANET 2
     p(2).MarkerSize = 10;
+    p(2).MarkerFaceColor = 'blue';
+    p(5).Color = [0 0 0.5];
+    
+    % SUN
+    p(3).MarkerSize = 20;
+    p(3).MarkerFaceColor = 'yellow';
+
+
+    legend('Planet 1', 'Planet 2', 'Sun');
     xlim([-3 3]);
     ylim([-3 3]);
     pause(e);
