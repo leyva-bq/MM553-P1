@@ -2,13 +2,14 @@ clc; clear;
 
 % define epsilon and t final 
 e = 1e-3;
-t_final = 50;
+t_final = 10;
 
 % calculate num of steps
 n_step = t_final/e;
 
-N = 10; % number of particles
-Q = 1:N; % initial positions
+N = 500; % number of particles
+length = 100; % length of string
+Q = linspace(1,length,N); % initial positions
 
 % define V and F
 V = @(i, j) 1/2 * (abs(i - j)^2)...
@@ -16,7 +17,7 @@ V = @(i, j) 1/2 * (abs(i - j)^2)...
           + 1/4 * (abs(i - j)^4);
 F = @(q) (abs(q) + abs(q)^2 + abs(q)^3) * sign(q);
 
-P = (rand(1, N) * 2) - 1; % define potentials
+P = (rand(1, N) * 2) - 1; % define momenta
 t(1) = 0;
 
 % calculate potential
@@ -33,12 +34,12 @@ H = 1/2 * sum(P.^2) + get_potentials(Q, V, N);
 %% euler-cromer iteration
 for i=1:n_step
     % get forces
-    force = Q(i,:);
-    for j=1:N
-        if j == 1
-            force(j) = -F(Q(i,j) - Q(i,j+1)); % only right neighbor
+    force = zeros(1,N);
+    for j=2:N-1
+        if j == 1 
+            force(j) = 0; % right neighbor
         elseif j == N
-            force(j) = F(Q(i,j-1) - Q(i,j)); % only left neighbor
+            force(j) = 0; % left neighbor
         else
             L = Q(i,j-1) - Q(i,j);
             R = Q(i,j) - Q(i,j+1);
@@ -49,13 +50,13 @@ for i=1:n_step
     P(i+1,:) = P(i,:) + e .* force;
     Q(i+1,:) = Q(i,:) + e .* P(i+1,:);
     Q(i+1,1) = 1;
-    Q(i+1,N) = N;
+    Q(i+1,N) = length;
     H(i+1,:) = 1/2 * sum(P(i+1,:).^2) + get_potentials(Q(i,:),V,N);
     t(i+1) = t(i) + e;
 end
 
 %% PLOTS
-plot_i = 5;
+plot_i = 2;
 plot(t, P(:,plot_i));
 title('Momentum (t vs p)');
 pause;
@@ -96,11 +97,28 @@ for i=1:n_step
 end
 
 %% SIMULATION
-for i=1:30:n_step
+for i=1:10:n_step
     %hold on
     %line([1.5 -1.5], [0 0], 'Color','r');
     scatter(Q(i,:), 0, 'o');
-    xlim([0.5 N+0.5]);
-    pause(0.01);
+    xlim([0.5 100+0.5]);
+    pause;
     %hold off
+end
+
+%% 4. AVG VELOCITY^2
+avg_vel_squared = sum(P'.^2) / N;
+plot(avg_vel_squared, 'x-');
+title('Average velocity squared over time (v^2(t) vs t)');
+xlabel('t');
+ylabel('<v^2>');
+
+%% 5. HISTOGRAM
+for t=1:5:n_step
+    h = P(t,:).^2;
+    histogram(h);
+    %xlim([0 0.5]);
+    %ylim([0 200]);
+    title(['Histogram of velocity squared over time (t = ' num2str(t) ')'])
+    pause(0.01);
 end
