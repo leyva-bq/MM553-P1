@@ -53,6 +53,33 @@ for n=1:2
     end
 end
 
+%% LEAP-FROG
+LF_p(1,:,:) = p(1,:,:);
+LF_q(1,:,:) = q(1,:,:);
+LF_H(1,:) = H(1,:);
+LF_t(1) = t(1);
+
+% first half step
+LF_p(2,1) = LF_p(1,1) + e/2 * Fx(LF_q(1,1), LF_q(1,2));
+LF_p(2,2) = LF_p(1,2) + e/2 * Fy(LF_q(1,1), LF_q(1,2));
+
+for i=2:nstep
+    LF_q(i,:) = LF_q(i-1,:) + e/m + LF_p(i,:);
+    LF_p(i+1,1) = LF_p(i,1) + e/2 + Fx(LF_q(i,1), LF_q(i,2));
+    LF_p(i+1,2) = LF_p(i,2) + e/2 + Fy(LF_q(i,1), LF_q(i,2));
+    LF_H(i,:) = dot(LF_p(i+1,:), LF_p(i+1,:)) / (2*m)...
+                + V(LF_q(i,1), LF_q(i,2));
+    LF_t(i) = t(i) + e;
+end
+
+% last half step
+LF_q(nstep+1,:) = LF_q(nstep,:) + e * LF_p(nstep+1,:)/m;
+LF_p(nstep+2,1) = LF_p(nstep+1,1) + e * Fx(LF_q(nstep+1,1), LF_q(nstep+1,2));
+LF_p(nstep+2,2) = LF_p(nstep+1,2) + e * Fy(LF_q(nstep+1,1), LF_q(nstep+1,2));
+LF_H(nstep+1,:) = dot(LF_p(nstep+1,:), LF_p(nstep+1,:)) / (2*m)...
+                + V(LF_q(nstep,1), LF_q(nstep,2));
+LF_t(nstep+1) = t(nstep) + e;
+
 %% RK2
 RK2_p(1,:,:) = p(1,:,:);
 RK2_q(1,:,:) = q(1,:,:);
