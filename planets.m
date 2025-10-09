@@ -18,8 +18,8 @@ Fx = @(x,y,m) - G*m*M * x * (x^2 + y^2)^(-3/2);
 Fy = @(x,y,m) - G*m*M * y * (x^2 + y^2)^(-3/2);
 
 % define p(t, n, p_n) & q(t, n, q_n)
-p(1,1,:) = [0 -1];
-p(1,2,:) = [0 1];
+p(1,1,:) = [0.3 -1.2];
+p(1,2,:) = [-0.1 0.9];
 q(1,1,:) = [1 1];
 q(1,2,:) = [-1 -1];
 t(1) = 0;
@@ -143,6 +143,15 @@ for i=1:5:nstep
     else
         range = i-trail:i;
     end
+
+    p1_x = RK2_q(i,1,1);
+    p1_y = RK2_q(i,1,2);
+    p1_r = sqrt(p1_x.^2 + p1_y.^2);
+    
+    p2_x = RK2_q(i,2,1);
+    p2_y = RK2_q(i,2,2);
+    p2_r = sqrt(p2_x.^2 + p2_y.^2);
+
     p = plot(RK2_q(i,1,1), RK2_q(i,1,2), 'o', ...
              RK2_q(i,2,1), RK2_q(i,2,2), 'o', ...
              0,0,'o',...
@@ -165,7 +174,32 @@ for i=1:5:nstep
 
 
     legend('Planet 1', 'Planet 2', 'Sun');
+    text(p1_x, p1_y, ['    r = ', num2str(p1_r)]);
+    text(p2_x, p2_y, ['    r = ', num2str(p2_r)]);
     xlim([-3 3]);
     ylim([-3 3]);
     pause(e);
 end
+
+%% KEPLER
+kep = [];
+
+for n=1:2
+    planet_q = squeeze(q(:,n,:));
+    planet_r = sqrt(planet_q(:,1).^2 + planet_q(:,2).^2);
+    
+    [max, I_max] = findpeaks(planet_r);
+    [min, I_min] = findpeaks(-planet_r);
+    
+    perihelion = planet_q(I_min(1), :);
+    aphelion = planet_q(I_max(1), :);
+    V = perihelion - aphelion;
+    a = sqrt(V * V') / 2;
+    T = I_max(2) - I_max(1);
+    
+    kep = [kep; a^3/T^2];
+    
+end
+bar(kep);
+title('Kepler constant (a^3/T^2)');
+text(1:length(kep), kep, num2str(kep), 'vert','bottom','horiz','center');
