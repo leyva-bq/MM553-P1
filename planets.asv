@@ -136,7 +136,7 @@ ylabel('H');
 pause;
 
 %% SIMULATION
-trail = nstep;
+trail = 500;
 for i=1:5:nstep
     if i <= trail
         range = 1:i;
