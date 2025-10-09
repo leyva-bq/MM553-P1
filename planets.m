@@ -10,7 +10,7 @@ nstep = tf/e;
 % define constants
 G = 3;
 M = 30;
-m = [1.4e-1 1.3e-1];
+m = [1.1e-1 1.3e-1];
 
 % define V & F
 V = @(x,y,m) - G*m*M * (x^2 + y^2)^(-1/2);
@@ -18,7 +18,7 @@ Fx = @(x,y,m) - G*m*M * x * (x^2 + y^2)^(-3/2);
 Fy = @(x,y,m) - G*m*M * y * (x^2 + y^2)^(-3/2);
 
 % define p(t, n, p_n) & q(t, n, q_n)
-p(1,1,:) = [0.3 -1.2];
+p(1,1,:) = [0.3 -0.8];
 p(1,2,:) = [-0.1 0.9];
 q(1,1,:) = [1 1];
 q(1,2,:) = [-1 -1];
@@ -144,19 +144,19 @@ for i=1:5:nstep
         range = i-trail:i;
     end
 
-    p1_x = RK2_q(i,1,1);
-    p1_y = RK2_q(i,1,2);
+    p1_x = q(i,1,1);
+    p1_y = q(i,1,2);
     p1_r = sqrt(p1_x.^2 + p1_y.^2);
     
-    p2_x = RK2_q(i,2,1);
-    p2_y = RK2_q(i,2,2);
+    p2_x = q(i,2,1);
+    p2_y = q(i,2,2);
     p2_r = sqrt(p2_x.^2 + p2_y.^2);
 
-    p = plot(RK2_q(i,1,1), RK2_q(i,1,2), 'o', ...
-             RK2_q(i,2,1), RK2_q(i,2,2), 'o', ...
+    p = plot(q(i,1,1), q(i,1,2), 'o', ...
+             q(i,2,1), q(i,2,2), 'o', ...
              0,0,'o',...
-             RK2_q(range,1,1), RK2_q(range,1,2), '-',...
-             RK2_q(range,2,1), RK2_q(range,2,2), '-');
+             q(range,1,1), q(range,1,2), '-',...
+             q(range,2,1), q(range,2,2), '-');
 
     % PLANET 1
     p(1).MarkerSize = 10;
@@ -195,7 +195,7 @@ for n=1:2
     aphelion = planet_q(I_max(1), :);
     V = perihelion - aphelion;
     a = sqrt(V * V') / 2;
-    T = I_max(2) - I_max(1);
+    T = I_min(2) - I_min(1);
     
     kep = [kep; a^3/T^2];
     
