@@ -136,13 +136,16 @@ ylabel('H');
 pause;
 
 %% SIMULATION
-trail = 500;
+trail = nstep;
 for i=1:5:nstep
     if i <= trail
         range = 1:i;
     else
         range = i-trail:i;
     end
+    p1_x = RK2_q(i,1,1);
+    p1_y = RK2_q(i,1,2);
+    p1_r = sqrt(p1_x.^2 + p1_y.^2);
     p = plot(RK2_q(i,1,1), RK2_q(i,1,2), 'o', ...
              RK2_q(i,2,1), RK2_q(i,2,2), 'o', ...
              0,0,'o',...
@@ -165,7 +168,21 @@ for i=1:5:nstep
 
 
     legend('Planet 1', 'Planet 2', 'Sun');
+    text(p1_x, p1_y, ['    r = ', num2str(p1_r)]);
     xlim([-3 3]);
     ylim([-3 3]);
     pause(e);
 end
+
+%% KEPLER
+planet_q = squeeze(q(:,1,:));
+planet_r = sqrt(planet_q(:,1).^2 + planet_q(:,2).^2);
+
+[pks, I] = findpeaks(planet_r);
+
+a = pks(1);
+T = I(2) - I(1);
+
+kepler_constant = a^3/T^2;
+
+kepler_constant
