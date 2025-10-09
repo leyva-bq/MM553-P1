@@ -2,7 +2,7 @@ clc; clear;
 
 % define epsilon and t final 
 e = 1e-3;
-tf = 3;
+tf = 5;
 
 % calculate num of steps
 nstep = tf/e;
@@ -84,9 +84,11 @@ for n=1:2
         RK2_p(i+1,n,:) = pn + e * RK2_k2_p(i,:);
         RK2_q(i+1,n,:) = qn + e * RK2_k2_q(i,:);
         
-        RK2_H(i+1,:) = RK2_H(i,:) + dot(pn,pn) / (2*m(n)) + V(qx, qy, m(n));
         if n==1
+            RK2_H(i+1,:) = dot(pn,pn) / (2*m(n)) + V(qx, qy, m(n));
             RK2_t(i+1) = RK2_t(i) + e;
+        else
+            RK2_H(i+1,:) = RK2_H(i+1,:) + dot(pn,pn) / (2*m(n)) + V(qx, qy, m(n));
         end
     end
 end
