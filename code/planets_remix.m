@@ -9,14 +9,17 @@ T = 0:e:tf;
 % CONSTANTS
 G = 3;
 M = 30;
-all_m = [1.1e-1 1.3e-1];
-nplanets = 2;
+all_m = [1.1e-1 1.3e-1 1.2e-1];
+nplanets = 3;
 
 % DEFINE P & Q
 all_P(1,1,:) = [0.3 -0.8];
 all_P(1,2,:) = [-0.1 0.9];
+all_P(1,3,:) = [-0.5 -0.1];
+
 all_Q(1,1,:) = [1 1];
 all_Q(1,2,:) = [-1 -1];
+all_Q(1,3,:) = [0 1.2];
 
 for n=1:nplanets
     P = squeeze(all_P(:,n,:))';
@@ -89,48 +92,50 @@ for i=1:5:nstep
         range = i-trail:i;
     end
 
-    p1_x = q(i,1,1);
-    p1_y = q(i,1,2);
-    p1_r = sqrt(p1_x.^2 + p1_y.^2);
+    X = squeeze(all_RK2_Q(i,:,1));
+    Y = squeeze(all_RK2_Q(i,:,2));
+    trail_X = squeeze(all_RK2_Q(1:i,:,1));
+    trail_Y = squeeze(all_RK2_Q(1:i,:,2));
     
-    p2_x = q(i,2,1);
-    p2_y = q(i,2,2);
-    p2_r = sqrt(p2_x.^2 + p2_y.^2);
+    rng(n^2,"twister");
+    p = scatter(X, Y, 'o', ...
+                X, Y, 'x', ...
+                0, 0, 'O');
 
-    p = plot(q(i,1,1), q(i,1,2), 'o', ...
-             q(i,2,1), q(i,2,2), 'o', ...
-             0,0,'o',...
-             q(range,1,1), q(range,1,2), '-',...
-             q(range,2,1), q(range,2,2), '-');
-
-    % PLANET 1
-    p(1).MarkerSize = 10;
-    p(1).MarkerFaceColor = 'red';
-    p(4).Color = [0.5 0 0];
-
-    % PLANET 2
-    p(2).MarkerSize = 10;
-    p(2).MarkerFaceColor = 'blue';
-    p(5).Color = [0 0 0.5];
-    
     % SUN
-    p(3).MarkerSize = 20;
-    p(3).MarkerFaceColor = 'yellow';
+    p(2).MarkerSize = 20;
+    p(2).MarkerFaceColor = 'yellow';
 
-
-    legend('Planet 1', 'Planet 2', 'Sun');
-    text(p1_x, p1_y, ['    r = ', num2str(p1_r)]);
-    text(p2_x, p2_y, ['    r = ', num2str(p2_r)]);
     xlim([-3 3]);
     ylim([-3 3]);
-    pause(e);
+    pause;
+    
+
+    % % PLANET 1
+    % p(1).MarkerSize = 10;
+    % p(1).MarkerFaceColor = 'red';
+    % p(4).Color = [0.5 0 0];
+    % 
+    % % PLANET 2
+    % p(2).MarkerSize = 10;
+    % p(2).MarkerFaceColor = 'blue';
+    % p(5).Color = [0 0 0.5];
+    % 
+    % % SUN
+    % p(3).MarkerSize = 20;
+    % p(3).MarkerFaceColor = 'yellow';
+    % 
+    % 
+    % legend('Planet 1', 'Planet 2', 'Sun');
+    % text(p1_x, p1_y, ['    r = ', num2str(p1_r)]);
+    % text(p2_x, p2_y, ['    r = ', num2str(p2_r)]);
 end
 
 %% KEPLER
 kep = [];
 
-for n=1:2
-    planet_q = squeeze(q(:,n,:));
+for n=1:nplanets
+    planet_q = squeeze(all_RK2_Q(:,n,:));
     planet_r = sqrt(planet_q(:,1).^2 + planet_q(:,2).^2);
     
     [max, I_max] = findpeaks(planet_r);
