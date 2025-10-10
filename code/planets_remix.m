@@ -49,3 +49,72 @@ plot(T, RK2_H(:,1), 'x-',...
 legend('RK2', 'LF', 'EC');
 title('Hamiltonian over time');
 pause;
+
+%% SIMULATION
+trail = nstep;
+for i=1:5:nstep
+    if i <= trail
+        range = 1:i;
+    else
+        range = i-trail:i;
+    end
+
+    p1_x = q(i,1,1);
+    p1_y = q(i,1,2);
+    p1_r = sqrt(p1_x.^2 + p1_y.^2);
+    
+    p2_x = q(i,2,1);
+    p2_y = q(i,2,2);
+    p2_r = sqrt(p2_x.^2 + p2_y.^2);
+
+    p = plot(q(i,1,1), q(i,1,2), 'o', ...
+             q(i,2,1), q(i,2,2), 'o', ...
+             0,0,'o',...
+             q(range,1,1), q(range,1,2), '-',...
+             q(range,2,1), q(range,2,2), '-');
+
+    % PLANET 1
+    p(1).MarkerSize = 10;
+    p(1).MarkerFaceColor = 'red';
+    p(4).Color = [0.5 0 0];
+
+    % PLANET 2
+    p(2).MarkerSize = 10;
+    p(2).MarkerFaceColor = 'blue';
+    p(5).Color = [0 0 0.5];
+    
+    % SUN
+    p(3).MarkerSize = 20;
+    p(3).MarkerFaceColor = 'yellow';
+
+
+    legend('Planet 1', 'Planet 2', 'Sun');
+    text(p1_x, p1_y, ['    r = ', num2str(p1_r)]);
+    text(p2_x, p2_y, ['    r = ', num2str(p2_r)]);
+    xlim([-3 3]);
+    ylim([-3 3]);
+    pause(e);
+end
+
+%% KEPLER
+kep = [];
+
+for n=1:2
+    planet_q = squeeze(q(:,n,:));
+    planet_r = sqrt(planet_q(:,1).^2 + planet_q(:,2).^2);
+    
+    [max, I_max] = findpeaks(planet_r);
+    [min, I_min] = findpeaks(-planet_r);
+    
+    perihelion = planet_q(I_min(1), :);
+    aphelion = planet_q(I_max(1), :);
+    V = perihelion - aphelion;
+    a = sqrt(V * V') / 2;
+    T = I_min(2) - I_min(1);
+    
+    kep = [kep; a^3/T^2];
+    
+end
+bar(kep);
+title('Kepler constant (a^3/T^2)');
+text(1:length(kep), kep, num2str(kep), 'vert','bottom','horiz','center');
