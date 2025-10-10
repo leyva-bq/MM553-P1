@@ -19,10 +19,10 @@ arguments (Output)
 end
 
 for t=1:nstep
-    P(t+1) = P(t) + e * F(Q(t));
-    Q(t+1) = Q(t) + e * P(t+1)/M; % Change P(i+1) to P(i)
+    P(t+1,:) = P(t,:) + e * F(Q(t,:));
+    Q(t+1,:) = Q(t,:) + e * P(t+1,:)/M; % Change P(i+1) to P(i)
                                      % for EC to Euler, respectively
-    H(t+1) = 1/2 * P(t+1)^2 / M + V(Q(t+1));
+    H(t+1,:) = 1/2 * dot(P(t+1,:),P(t+1,:)) / M + V(Q(t+1,:));
 end
 
 end
