@@ -19,18 +19,18 @@ arguments (Output)
 end
 
 for t=1:nstep
-    k1_Q = P(t)/M;
-    k1_P = F(Q(t));
+    k1_Q = P(t,:)/M;
+    k1_P = F(Q(t,:));
 
-    Q_mid = Q(t) + e/2 * k1_Q;
-    P_mid = P(t) + e/2 * k1_P;
+    Q_mid = Q(t,:) + e/2 * k1_Q;
+    P_mid = P(t,:) + e/2 * k1_P;
 
     k2_Q = P_mid / M;
     k2_P = F(Q_mid);
 
-    P(t+1) = P(t) + e * k2_P;
-    Q(t+1) = Q(t) + e * k2_Q;
-    H(t+1) = 1/2 * P(t+1)^2 / M + V(Q(t+1));
+    P(t+1,:) = P(t,:) + e * k2_P;
+    Q(t+1,:) = Q(t,:) + e * k2_Q;
+    H(t+1,:) = 1/2 * dot(P(t+1,:),P(t+1,:)) / M + V(Q(t+1,:));
 end
 
 end
