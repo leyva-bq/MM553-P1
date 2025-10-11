@@ -37,21 +37,21 @@ for n=1:nplanets
     % INTEGRATION METHODS
     [all_EC_P(:,n,:),...
      all_EC_Q(:,n,:),...
-     all_EC_H(:,n,:)] = euler_cromer(P,Q,F,V,H,m,e,nstep);
+     all_EC_H(:,n)] = euler_cromer(P,Q,F,V,H,m,e,nstep);
     
     [all_LF_P(:,n,:),...
      all_LF_Q(:,n,:),...
-     all_LF_H(:,n,:)] = leapfrog(P,Q,F,V,H,m,e,nstep);
+     all_LF_H(:,n)] = leapfrog(P,Q,F,V,H,m,e,nstep);
     
     [all_RK2_P(:,n,:),...
      all_RK2_Q(:,n,:),...
-     all_RK2_H(:,n,:)] = RK2(P,Q,F,V,H,m,e,nstep);
+     all_RK2_H(:,n)] = RK2(P,Q,F,V,H,m,e,nstep);
 end
 
-% SUM HAMILTONIANS WIP
-% all_EC_H(:,n,) =
-% all_LF_H
-% all_RK2_H
+% SUM HAMILTONIANS
+all_EC_H = sum(all_EC_H, 2);
+all_LF_H = sum(all_LF_H, 2);
+all_RK2_H = sum(all_RK2_H, 2);
 
 %% PLOTS
 hold on
@@ -75,12 +75,12 @@ legend('RK2', 'LF', 'EC');
 title('Position over time');
 pause;
 
-
-plot(T, RK2_H(:,1), 'x-',...
-     T, LF_H(:,1) , 'o-',...
-     T, EC_H(:,1) , 's-');
+%%
+plot(T, all_RK2_H, 'x-',...
+     T, all_LF_H, 'o-',...
+     T, all_EC_H, 's-');
 legend('RK2', 'LF', 'EC');
-title('Hamiltonian over time');
+title('Energy over time');
 pause;
 
 %% SIMULATION
