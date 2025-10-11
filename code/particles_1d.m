@@ -37,9 +37,11 @@ for i=1:n_step
     force = zeros(1,N);
     for j=2:N-1
         if j == 1 
-            force(j) = 0; % right neighbor
+            R = Q(i,j) - Q(i,j+1);
+            force(j) = - F(R); % right neighbor
         elseif j == N
-            force(j) = 0; % left neighbor
+            L = Q(i,j-1) - Q(i,j);
+            force(j) = F(L); % left neighbor
         else
             L = Q(i,j-1) - Q(i,j);
             R = Q(i,j) - Q(i,j+1);
