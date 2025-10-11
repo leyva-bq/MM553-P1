@@ -1,21 +1,25 @@
 clear; clc;
 
-% specific problem
-k = 0.4; % spring constant
-F = @(q) -k * q;
-V = @(q) 0.5 * k * q^2;
-
-% initial conditions
-P(1) = 0.2;
-Q(1) = 0.5;
-M = 0.35;
-H(1) = 1/2 * P(1).^2 / M + V(Q(1));
-
-% time stuff
+% DEFINE TIME
 e = 1e-3;
-tf = 100;
+tf = 10;
 nstep = tf/e;
 T = 0:e:tf;
+
+% DEFINE CONSTANTS
+k = 0.4; % spring constant
+M = 0.35;
+
+% DEFINE P & Q
+P(1) = 0.2;
+Q(1) = 0.5;
+
+% DEFINE V & F
+V = @(q) 0.5 * k * q^2;
+F = @(q) -k * q;
+
+% DEFINE H
+H(1) = 1/2 * P(1).^2 / M + V(Q(1));
 
 [EC_P,EC_Q,EC_H] = euler_cromer(P,Q,F,V,H,M,e,nstep);
 [LF_P,LF_Q,LF_H] = leapfrog(P,Q,F,V,H,M,e,nstep);
