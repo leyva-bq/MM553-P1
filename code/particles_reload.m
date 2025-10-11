@@ -1,58 +1,43 @@
-clc; clear;
+clear;
 
-% define epsilon and t final 
+% TIME STUFF
 e = 1e-2;
-t_final = 50;
+tf = 10;
+nstep = tf/e;
+T = 0:e:tf;
 
-% calculate num of steps
-n_step = t_final/e;
+% CONSTANTS
+n_particles = 500; % number of particles
+length = 500; % length of string
 
-N = 500; % number of particles
-length = 10; % length of string
-Q = linspace(1,length,N); % initial positions
+% DEFINE P & Q
+Q(1,:) = linspace(1,length,n_particles);
+P(1,:) = (rand(1, n_particles) * 0.5) - 0.5;
 
-% define V and F
-V = @(q) 1/2 * (abs(q(1) - q(2))^2)...
-          + 1/3 * (abs(q(1) - q(2))^3)...
-          + 1/4 * (abs(q(1) - q(2))^4);
-F = @(q) (abs(q) + abs(q)^2 + abs(q)^3) * sign(q);
+% DEFINE V & F
+V_h = @(X) [ diff(X,1,2) , 0 ];
+V = @(Q) 1/2 * (abs(V_h(Q)).^2)...
+       + 1/3 * (abs(V_h(Q)).^3)...
+       + 1/4 * (abs(V_h(Q)).^4);
 
-P = (rand(1, N) * 0.5) - 0.5; % define momenta
-t(1) = 0;
+F_h = @(X) (abs(X) + abs(X).^2 + abs(X).^3) * sign(X);
+F = @(Q) arrayfun(F_h, [ 0 , flip(diff(flip(Q),1,2)) ]) - ...
+         arrayfun(F_h, [ -diff(Q,1,2) , 0 ]);
 
-% calculate potential
-function potential = get_potentials(Q, V, N)
-    potential = 0;
-    for i=1:N-1
-        potential = potential + V(Q(i), Q(i+1));
-    end
-end
+% DEFINE H
+H(1,:) = 1/2 * P.^2 + V(Q);
+tic
+[EC_P,EC_Q,EC_H] = euler_cromer(P,Q,F,V,H,1,e,nstep, ...
+                                [n_particles, length]);
+toc
 
-% define Hamiltonian
-H = 1/2 * sum(P.^2) + get_potentials(Q, V, N);
+plot(sum(EC_H,2));
 
-%% euler-cromer iteration
-for i=1:n_step
-    % get forces
-    force = zeros(1,N);
-    for j=2:N-1
-        if j == 1 
-            force(j) = 0; % right neighbor
-        elseif j == N
-            force(j) = 0; % left neighbor
-        else
-            L = Q(i,j-1) - Q(i,j);
-            R = Q(i,j) - Q(i,j+1);
-            force(j) = F(L) - F(R);
-        end
-    end
-
-    P(i+1,:) = P(i,:) + e .* force;
-    Q(i+1,:) = Q(i,:) + e .* P(i+1,:);
-    Q(i+1,1) = 1;
-    Q(i+1,N) = length;
-    H(i+1,:) = 1/2 * sum(P(i+1,:).^2) + get_potentials(Q(i,:),V,N);
-    t(i+1) = t(i) + e;
+%% SIMULATION
+for i=1:100:nstep
+    scatter(EC_Q(i,:), 0, 'o');
+    xlim([0.5 length+0.5]);
+    pause(e);    
 end
 
 %% PLOTS
@@ -73,41 +58,8 @@ plot(t, H);
 title('Energy (t vs H)');
 pause;
 
-%% RK2
-RK2_p(1) = p(1);
-RK2_q(1) = q(1);
-RK2_H(1) = H(1);
-RK2_t(1) = t(1);
-
-for i=1:n_step
-    RK2_k1_q = RK2_p(i)/m;
-    RK2_k1_p = F(RK2_q(i));
-
-    RK2_q_mid = RK2_q(i) + e * 0.5 * RK2_k1_q;
-    RK2_p_mid = RK2_p(i) + e * 0.5 * RK2_k1_p;
-
-    RK2_k2_q = RK2_p_mid / m;
-    RK2_k2_p = F(RK2_q_mid);
-
-    RK2_p(i+1) = RK2_p(i) + e * RK2_k2_p;
-    RK2_q(i+1) = RK2_q(i) + e * RK2_k2_q;
-    
-    RK2_H(i+1) = RK2_p(i+1) * RK2_p(i+1) / (2*m) + V(RK2_q(i+1));
-    RK2_t(i+1) = RK2_t(i) + e;
-end
-
-%% SIMULATION
-for i=1:10:n_step
-    %hold on
-    %line([1.5 -1.5], [0 0], 'Color','r');
-    scatter(Q(i,:), 0, 'o');
-    xlim([0.5 100+0.5]);
-    pause;
-    %hold off
-end
-
 %% 4. AVG VELOCITY^2
-avg_vel_squared = sum(P'.^2) / N;
+avg_vel_squared = sum(EC_P'.^2) / n_particles;
 plot(avg_vel_squared, 'x-');
 title('Average velocity squared over time (v^2(t) vs t)');
 xlabel('t');
