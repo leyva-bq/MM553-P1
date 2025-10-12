@@ -37,4 +37,6 @@ for t=1:nstep
     % TOTAL ENERGY SHOULD HAVE SUM BUILT IN. I THINK WIP
 end
 
+H = sum(H, 2);
+
 end

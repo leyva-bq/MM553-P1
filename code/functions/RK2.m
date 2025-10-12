@@ -49,4 +49,6 @@ for t=1:nstep
     H(t+1,:) = 1/2 * dot(P(t+1,:),P(t+1,:)) / M + V(Q(t+1,:));
 end
 
+H = sum(H, 2);
+
 end

@@ -62,4 +62,6 @@ end
 %P(nstep+2) = P(nstep+1) + e/2 * F(Q(nstep+1)); % useless half step?
 H(nstep+1,:) = 1/2 * dot(P(nstep+1,:), P(nstep+1,:)) / M + V(Q(nstep+1,:));
 
+H = sum(H, 2);
+
 end
