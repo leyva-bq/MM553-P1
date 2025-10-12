@@ -2,13 +2,13 @@ clear;
 
 % TIME STUFF
 e = 1e-2;
-tf = 10;
+tf = 50;
 nstep = tf/e;
 T = 0:e:tf;
 
 % CONSTANTS
 n_particles = 500; % number of particles
-length = 500; % length of string
+length = 1000; % length of string
 
 % DEFINE P & Q
 Q(1,:) = linspace(1,length,n_particles);
@@ -35,32 +35,32 @@ tic
                                 [n_particles, length]);
 toc
 
-plot(T, sum(EC_H,2), 'o-', ...
-     T, sum(LF_H,2), 'x-', ...
-     T, sum(RK2_H,2), 's-');
+%%
+plot(T, EC_H, 'o-', ...
+     T, LF_H, 'x-', ...
+     T, RK2_H, 's-');
 
 %% SIMULATION
-% for i=1:100:nstep
-%     scatter(EC_Q(i,:), 0, 'o');
-%     xlim([0.5 length+0.5]);
-%     pause(e);    
-% end
+for i=1:nstep
+    scatter(EC_Q(i,290:310), 0, 'o');
+    pause;    
+end
 
 %% PLOTS
-plot_i = 2;
-plot(t, P(:,plot_i));
+plot_i = 300;
+plot(T, RK2_P(:,plot_i));
 title('Momentum (t vs p)');
 pause;
 
-plot(t, Q(:,plot_i));
+plot(T, RK2_Q(:,plot_i));
 title('Position (t vs q)');
 pause;
 
-plot(P(:,plot_i), Q(:,plot_i));
+plot(RK2_P(:,plot_i), RK2_Q(:,plot_i));
 title('Phase space diagram (p vs q)');
 pause;
 
-plot(t, H);
+plot(T, RK2_H);
 title('Energy (t vs H)');
 pause;
 
