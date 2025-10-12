@@ -29,16 +29,22 @@ H(1,:) = 1/2 * P.^2 + V(Q);
 tic
 [EC_P,EC_Q,EC_H] = euler_cromer(P,Q,F,V,H,1,e,nstep, ...
                                 [n_particles, length]);
+[LF_P,LF_Q,LF_H] = leapfrog(P,Q,F,V,H,1,e,nstep, ...
+                                [n_particles, length]);
+[RK2_P,RK2_Q,RK2_H] = RK2(P,Q,F,V,H,1,e,nstep, ...
+                                [n_particles, length]);
 toc
 
-plot(sum(EC_H,2));
+plot(T, sum(EC_H,2), 'o-', ...
+     T, sum(LF_H,2), 'x-', ...
+     T, sum(RK2_H,2), 's-');
 
 %% SIMULATION
-for i=1:100:nstep
-    scatter(EC_Q(i,:), 0, 'o');
-    xlim([0.5 length+0.5]);
-    pause(e);    
-end
+% for i=1:100:nstep
+%     scatter(EC_Q(i,:), 0, 'o');
+%     xlim([0.5 length+0.5]);
+%     pause(e);    
+% end
 
 %% PLOTS
 plot_i = 2;
@@ -66,8 +72,8 @@ xlabel('t');
 ylabel('<v^2>');
 
 %% 5. HISTOGRAM
-for t=1:5:n_step
-    h = P(t,:).^2;
+for t=1:1:nstep
+    h = RK2_P(t,:).^2;
     histogram(h);
     %xlim([0 0.5]);
     %ylim([0 200]);
