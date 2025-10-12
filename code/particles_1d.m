@@ -1,14 +1,14 @@
-clc; clear;
+clear;
 
 % define epsilon and t final 
 e = 1e-2;
-t_final = 50;
+t_final = 10;
 
 % calculate num of steps
 n_step = t_final/e;
 
-N = 500; % number of particles
-length = 10; % length of string
+N = 5; % number of particles
+length = 5; % length of string
 Q = linspace(1,length,N); % initial positions
 
 % define V and F
@@ -17,7 +17,8 @@ V = @(i, j) 1/2 * (abs(i - j)^2)...
           + 1/4 * (abs(i - j)^4);
 F = @(q) (abs(q) + abs(q)^2 + abs(q)^3) * sign(q);
 
-P = (rand(1, N) * 0.5) - 0.5; % define momenta
+%P = (rand(1, N) * 0.5) - 0.5; % define momenta
+P(1,:) = [0.5 0.5 0.5 0.5 0.5];
 t(1) = 0;
 
 % calculate potential
@@ -103,7 +104,7 @@ for i=1:10:n_step
     %hold on
     %line([1.5 -1.5], [0 0], 'Color','r');
     scatter(Q(i,:), 0, 'o');
-    xlim([0.5 100+0.5]);
+    xlim([0.5 5+0.5]);
     pause;
     %hold off
 end
