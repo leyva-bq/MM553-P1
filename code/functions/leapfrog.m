@@ -11,7 +11,7 @@ arguments (Input)
     e % EPSILON time step
     nstep % Number of steps
     NB = 0 % Fixed Boundary Conditions (optional)
-             % n, boundary
+           % n, boundary
 end
 
 arguments (Output)
@@ -59,7 +59,8 @@ if NB
     Q(nstep,NB(1)) = NB(2);
 end
 
-%P(nstep+2) = P(nstep+1) + e/2 * F(Q(nstep+1)); % useless half step?
+% P(nstep+2) = P(nstep+1) + e/2 * F(Q(nstep+1)); % not needed, since
+                                                 % nstep+2 exceeds range
 H(nstep+1,:) = 1/2 * dot(P(nstep+1,:), P(nstep+1,:)) / M + V(Q(nstep+1,:));
 
 H = sum(H, 2);
