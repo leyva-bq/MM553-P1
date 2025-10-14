@@ -2,17 +2,18 @@ clear;
 
 % TIME STUFF
 e = 1e-2;
-tf = 50;
+tf = 10;
 nstep = tf/e;
 T = 0:e:tf;
 
 % CONSTANTS
 n_particles = 500; % number of particles
-length = 1000; % length of string
+length = 500; % length of string
 
 % DEFINE P & Q
 Q(1,:) = linspace(1,length,n_particles);
-P(1,:) = (rand(1, n_particles) * 0.5) - 0.5;
+rng(1,"twister")
+P(1,:) = (rand(1, n_particles) * 5) - 5;
 
 % DEFINE V & F
 V_h = @(X) [ diff(X,1,2) , 0 ];
@@ -20,7 +21,8 @@ V = @(Q) 1/2 * (abs(V_h(Q)).^2)...
        + 1/3 * (abs(V_h(Q)).^3)...
        + 1/4 * (abs(V_h(Q)).^4);
 
-F_h = @(X) (abs(X) + abs(X).^2 + abs(X).^3) * sign(X);
+F_h = @(X) (X + X.^2 + X.^3);
+%F_h = @(X) (abs(X) + abs(X).^2 + abs(X).^3) * sign(X);
 F = @(Q) arrayfun(F_h, [ 0 , flip(diff(flip(Q),1,2)) ]) - ...
          arrayfun(F_h, [ -diff(Q,1,2) , 0 ]);
 
@@ -39,11 +41,16 @@ toc
 plot(T, EC_H, 'o-', ...
      T, LF_H, 'x-', ...
      T, RK2_H, 's-');
+title('Energy (T vs H)');
+legend('EC', 'LF', 'RK2');
+xlabel('T');
+ylabel('H');
 
 %% SIMULATION
-for i=1:nstep
-    scatter(EC_Q(i,290:310), 0, 'o');
-    pause;    
+for i=1:10:nstep
+    scatter(EC_Q(i,1:10), 0, 'o');
+    xlim([0.5 10.5]);
+    pause(e);    
 end
 
 %% PLOTS
@@ -66,17 +73,29 @@ pause;
 
 %% 4. AVG VELOCITY^2
 avg_vel_squared = sum(EC_P'.^2) / n_particles;
-plot(avg_vel_squared, 'x-');
+plot(T, avg_vel_squared, 'x-');
 title('Average velocity squared over time (v^2(t) vs t)');
 xlabel('t');
-ylabel('<v^2>');
+ylabel('v^2');
 
 %% 5. HISTOGRAM
 for t=1:1:nstep
     h = RK2_P(t,:).^2;
-    histogram(h);
-    %xlim([0 0.5]);
+    histogram(h,15);
+    % xlim([0 0.5]);
     %ylim([0 200]);
-    title(['Histogram of velocity squared over time (t = ' num2str(t) ')'])
-    pause(0.01);
+    title(['Histogram of velocity squared over time (t = ' num2str(t*e) ')'])
+    pause(e);
+end
+
+%% MAXWELL
+m = 1;
+k = 1.38e-20;
+temp = 100;
+v = RK2_P(100,:);
+
+for temp=0:1000:10e20
+    h = sqrt(m / (2*pi*k*temp)) * exp(-m*v.^2 / (2*k*temp));
+    scatter(v.^2,h);
+    pause(e);
 end
