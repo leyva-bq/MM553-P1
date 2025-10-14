@@ -7,8 +7,8 @@ t_final = 10;
 % calculate num of steps
 n_step = t_final/e;
 
-N = 5; % number of particles
-length = 5; % length of string
+N = 500; % number of particles
+length = 100; % length of string
 Q = linspace(1,length,N); % initial positions
 
 % define V and F
@@ -17,8 +17,7 @@ V = @(i, j) 1/2 * (abs(i - j)^2)...
           + 1/4 * (abs(i - j)^4);
 F = @(q) (abs(q) + abs(q)^2 + abs(q)^3) * sign(q);
 
-%P = (rand(1, N) * 0.5) - 0.5; % define momenta
-P(1,:) = [0.5 0.5 0.5 0.5 0.5];
+P(1,:) = (ones(1, n_particles) * 1) - 0.5;
 t(1) = 0;
 
 % calculate potential
@@ -72,6 +71,7 @@ plot(P(:,plot_i), Q(:,plot_i));
 title('Phase space diagram (p vs q)');
 pause;
 
+%%
 plot(t, H);
 title('Energy (t vs H)');
 pause;
