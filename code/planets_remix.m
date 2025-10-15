@@ -15,12 +15,13 @@ nplanets = 3;
 % DEFINE P & Q
 all_P(1,1,:) = [0.3 -0.8];
 all_P(1,2,:) = [-0.1 0.9];
-all_P(1,3,:) = [-0.5 -0.1];
+all_P(1,3,:) = [-0.5 -0.9];
 
 all_Q(1,1,:) = [1 1];
 all_Q(1,2,:) = [-1 -1];
-all_Q(1,3,:) = [0 1.2];
+all_Q(1,3,:) = [1 0];
 
+tic
 for n=1:nplanets
     P = squeeze(all_P(:,n,:))';
     Q = squeeze(all_Q(:,n,:))';
@@ -47,11 +48,54 @@ for n=1:nplanets
      all_RK2_Q(:,n,:),...
      all_RK2_H(:,n)] = RK2(P,Q,F,V,H,m,e,nstep);
 end
+toc
 
-% SUM HAMILTONIANS
-all_EC_H = sum(all_EC_H, 2);
-all_LF_H = sum(all_LF_H, 2);
-all_RK2_H = sum(all_RK2_H, 2);
+%% REAL PLOTS
+plot3(all_RK2_P(:,1,1), all_RK2_P(:,1,2), T, '^-',...
+      all_LF_P(:,1,1) , all_LF_P(:,1,2) , T, 'x-',...
+      all_EC_P(:,1,1) , all_EC_P(:,1,2) , T, 'o-',...
+      all_RK2_P(:,2,1), all_RK2_P(:,2,2), T, '^-',...
+      all_LF_P(:,2,1) , all_LF_P(:,2,2) , T, 'x-',...
+      all_EC_P(:,2,1) , all_EC_P(:,2,2) , T, 'o-',...
+      all_RK2_P(:,3,1), all_RK2_P(:,3,2), T, '^-',...
+      all_LF_P(:,3,1) , all_LF_P(:,3,2) , T, 'x-',...
+      all_EC_P(:,3,1) , all_EC_P(:,3,2) , T, 'o-');
+title('Momentum (P_x vs P_y vs T)');
+legend('P1 - RK2', 'P1 - LF', 'P1 - EC', ...
+       'P2 - RK2', 'P2 - LF', 'P2 - EC', ...
+       'P3 - RK2', 'P3 - LF', 'P3 - EC');
+xlabel('p_x');
+ylabel('p_y');
+zlabel('t');
+pause;
+
+plot3(all_RK2_Q(:,1,1), all_RK2_Q(:,1,2), T, '^-',...
+      all_LF_Q(:,1,1) , all_LF_Q(:,1,2) , T, 'x-',...
+      all_EC_Q(:,1,1) , all_EC_Q(:,1,2) , T, 'o-',...
+      all_RK2_Q(:,2,1), all_RK2_Q(:,2,2), T, '^-',...
+      all_LF_Q(:,2,1) , all_LF_Q(:,2,2) , T, 'x-',...
+      all_EC_Q(:,2,1) , all_EC_Q(:,2,2) , T, 'o-',...
+      all_RK2_Q(:,3,1), all_RK2_Q(:,3,2), T, '^-',...
+      all_LF_Q(:,3,1) , all_LF_Q(:,3,2) , T, 'x-',...
+      all_EC_Q(:,3,1) , all_EC_Q(:,3,2) , T, 'o-');
+title('Position (Q_x vs Q_y vs T)');
+legend('P1 - RK2', 'P1 - LF', 'P1 - EC', ...
+       'P2 - RK2', 'P2 - LF', 'P2 - EC', ...
+       'P3 - RK2', 'P3 - LF', 'P3 - EC');
+xlabel('q_x');
+ylabel('q_y');
+zlabel('t');
+pause;
+
+plot(T, all_RK2_H, '^-',...
+     T, all_LF_H, 's-',...
+     T, all_EC_H, 'o-');
+legend('RK2', 'LF', 'EC');
+title('Energy over time');
+legend('P1 - RK2', 'P2 - RK2', 'P3 - RK2', ...
+       'P1 - LF', 'P2 - LF', 'P3 - LF', ...
+       'P1 - EC', 'P2 - EC', 'P3 - EC');
+pause;
 
 %% PLOTS
 hold on
@@ -98,17 +142,27 @@ for i=1:5:nstep
     trail_Y = squeeze(all_RK2_Q(1:i,:,2));
     
     rng(n^2,"twister");
-    p = scatter(X, Y, 'o', ...
-                X, Y, 'x', ...
-                0, 0, 'O');
+    p = plot(0, 0, 'o', ...
+             X(1), Y(1), 'o', ...
+             X(2), Y(2), 'o', ...
+             X(3), Y(3), 'o', MarkerSize=10);
 
     % SUN
-    p(2).MarkerSize = 20;
-    p(2).MarkerFaceColor = 'yellow';
+    p(1).MarkerSize = 20;
+    p(1).MarkerFaceColor = 'yellow';
+    p(1).MarkerEdgeColor = 'red';
+
+    % PLANETS
+    p(2).MarkerFaceColor = 'red';
+    p(3).MarkerFaceColor = 'cyan';
+    p(4).MarkerFaceColor = 'blue';
+    
+    % MORE STUFF
+    legend('Sun', 'Planet 1', 'Planet 2', 'Planet 3');
 
     xlim([-3 3]);
     ylim([-3 3]);
-    pause;
+    pause(e);
     
 
     % % PLANET 1
