@@ -90,41 +90,12 @@ pause;
 plot(T, all_RK2_H, '^-',...
      T, all_LF_H, 's-',...
      T, all_EC_H, 'o-');
-legend('RK2', 'LF', 'EC');
 title('Energy over time');
-legend('P1 - RK2', 'P2 - RK2', 'P3 - RK2', ...
-       'P1 - LF', 'P2 - LF', 'P3 - LF', ...
-       'P1 - EC', 'P2 - EC', 'P3 - EC');
-pause;
-
-%% PLOTS
-hold on
-for n=1:nplanets
-    plot3(all_RK2_P(:,n,1), all_RK2_P(:,n,2), T, 'x-',...
-          all_LF_P(:,n,1) , all_LF_P(:,n,2) , T, 'o-',...
-          all_EC_P(:,n,1) , all_EC_P(:,n,2) , T, 's-');
-    legend(['P' num2str(n) ' - RK2'], ...
-           ['P' num2str(n) ' - LF'], ...
-           ['P' num2str(n) ' - EC']);
-    pause;
-end
-hold off
-title('Momenta over time');
-pause;
-
-plot3(RK2_Q(:,1), RK2_Q(:,2), T, 'x-',...
-      LF_Q(:,1) , LF_Q(:,2) , T, 'o-',...
-      EC_Q(:,1) , EC_Q(:,2) , T, 's-');
-legend('RK2', 'LF', 'EC');
-title('Position over time');
-pause;
-
-%%
-plot(T, all_RK2_H, 'x-',...
-     T, all_LF_H, 'o-',...
-     T, all_EC_H, 's-');
-legend('RK2', 'LF', 'EC');
-title('Energy over time');
+legend('P1 - RK2', 'P1 - LF', 'P1 - EC', ...
+       'P2 - RK2', 'P2 - LF', 'P2 - EC', ...
+       'P3 - RK2', 'P3 - LF', 'P3 - EC');
+xlabel('t');
+ylabel('H');
 pause;
 
 %% SIMULATION
@@ -136,16 +107,19 @@ for i=1:5:nstep
         range = i-trail:i;
     end
 
-    X = squeeze(all_RK2_Q(i,:,1));
-    Y = squeeze(all_RK2_Q(i,:,2));
+    X = squeeze(all_RK2_Q(:,:,1));
+    Y = squeeze(all_RK2_Q(:,:,2));
     trail_X = squeeze(all_RK2_Q(1:i,:,1));
     trail_Y = squeeze(all_RK2_Q(1:i,:,2));
     
-    rng(n^2,"twister");
     p = plot(0, 0, 'o', ...
-             X(1), Y(1), 'o', ...
-             X(2), Y(2), 'o', ...
-             X(3), Y(3), 'o', MarkerSize=10);
+             X(i, 1), Y(i, 1), 'o', ...
+             X(i, 2), Y(i, 2), 'o', ...
+             X(i, 3), Y(i, 3), 'o', ...
+             X(range, 1), Y(range, 1), '-', ...
+             X(range, 2), Y(range, 2), '-', ...
+             X(range, 3), Y(range, 3), '-', ...
+             MarkerSize=10);
 
     % SUN
     p(1).MarkerSize = 20;
@@ -153,36 +127,16 @@ for i=1:5:nstep
     p(1).MarkerEdgeColor = 'red';
 
     % PLANETS
-    p(2).MarkerFaceColor = 'red';
+    p(2).MarkerFaceColor = 'green';
     p(3).MarkerFaceColor = 'cyan';
-    p(4).MarkerFaceColor = 'blue';
+    p(4).MarkerFaceColor = 'red';
     
     % MORE STUFF
     legend('Sun', 'Planet 1', 'Planet 2', 'Planet 3');
-
+    title(['System of planets (t = ' num2str(i*e) ')']);
     xlim([-3 3]);
     ylim([-3 3]);
     pause(e);
-    
-
-    % % PLANET 1
-    % p(1).MarkerSize = 10;
-    % p(1).MarkerFaceColor = 'red';
-    % p(4).Color = [0.5 0 0];
-    % 
-    % % PLANET 2
-    % p(2).MarkerSize = 10;
-    % p(2).MarkerFaceColor = 'blue';
-    % p(5).Color = [0 0 0.5];
-    % 
-    % % SUN
-    % p(3).MarkerSize = 20;
-    % p(3).MarkerFaceColor = 'yellow';
-    % 
-    % 
-    % legend('Planet 1', 'Planet 2', 'Sun');
-    % text(p1_x, p1_y, ['    r = ', num2str(p1_r)]);
-    % text(p2_x, p2_y, ['    r = ', num2str(p2_r)]);
 end
 
 %% KEPLER
