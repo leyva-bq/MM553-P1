@@ -100,22 +100,22 @@ pause;
 
 %% SIMULATION
 trail = nstep;
-for i=1:5:nstep
-    if i <= trail
-        range = 1:i;
+for t=1:5:nstep
+    if t <= trail
+        range = 1:t;
     else
-        range = i-trail:i;
+        range = t-trail:t;
     end
 
     X = squeeze(all_RK2_Q(:,:,1));
     Y = squeeze(all_RK2_Q(:,:,2));
-    trail_X = squeeze(all_RK2_Q(1:i,:,1));
-    trail_Y = squeeze(all_RK2_Q(1:i,:,2));
+    trail_X = squeeze(all_RK2_Q(1:t,:,1));
+    trail_Y = squeeze(all_RK2_Q(1:t,:,2));
     
     p = plot(0, 0, 'o', ...
-             X(i, 1), Y(i, 1), 'o', ...
-             X(i, 2), Y(i, 2), 'o', ...
-             X(i, 3), Y(i, 3), 'o', ...
+             X(t, 1), Y(t, 1), 'o', ...
+             X(t, 2), Y(t, 2), 'o', ...
+             X(t, 3), Y(t, 3), 'o', ...
              X(range, 1), Y(range, 1), '-', ...
              X(range, 2), Y(range, 2), '-', ...
              X(range, 3), Y(range, 3), '-', ...
@@ -133,7 +133,7 @@ for i=1:5:nstep
     
     % MORE STUFF
     legend('Sun', 'Planet 1', 'Planet 2', 'Planet 3');
-    title(['System of planets (t = ' num2str(i*e) ')']);
+    title(['System of planets (t = ' num2str(t*e) ')']);
     xlim([-3 3]);
     ylim([-3 3]);
     pause(e);
