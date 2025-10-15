@@ -13,7 +13,7 @@ length = 500; % length of string
 % DEFINE P & Q
 Q(1,:) = linspace(1,length,n_particles);
 rng(1,"twister")
-P(1,:) = (rand(1, n_particles) * 5) - 5;
+P(1,:) = (rand(1, n_particles) * 0.5) - 0.5;
 
 % DEFINE V & F
 V_h = @(X) [ diff(X,1,2) , 0 ];
@@ -37,7 +37,7 @@ tic
                                 [n_particles, length]);
 toc
 
-%%
+%% ENERGY
 plot(T, EC_H, 'o-', ...
      T, LF_H, 'x-', ...
      T, RK2_H, 's-');
