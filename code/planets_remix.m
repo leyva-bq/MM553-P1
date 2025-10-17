@@ -153,9 +153,9 @@ for n=1:nplanets
     aphelion = planet_q(I_max(1), :);
     V = perihelion - aphelion;
     a = sqrt(V * V') / 2;
-    T = I_min(2) - I_min(1);
+    T_orbit = I_min(2) - I_min(1);
     
-    kep = [kep; a^3/T^2];
+    kep = [kep; a^3/T_orbit^2];
     
 end
 bar(kep);
