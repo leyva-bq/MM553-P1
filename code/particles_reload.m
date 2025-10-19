@@ -1,8 +1,8 @@
 clear;
 
 % TIME STUFF
-e = 1e-2;
-tf = 10;
+e = 1e-3;
+tf = 5;
 nstep = tf/e;
 T = 0:e:tf;
 
@@ -11,9 +11,9 @@ n_particles = 500; % number of particles
 length = 500; % length of string
 
 % DEFINE P & Q
-Q(1,:) = linspace(1,length,n_particles);
-rng(1,"twister")
-P(1,:) = (rand(1, n_particles) * 0.5) - 0.5;
+Q(1,:) = zeros(1,n_particles);
+range = 1;
+P(1,:) = (rand(1, n_particles) * 2 * range) - range;
 
 % DEFINE V & F
 V_h = @(X) [ diff(X,1,2) , 0 ];
@@ -21,20 +21,16 @@ V = @(Q) 1/2 * (abs(V_h(Q)).^2)...
        + 1/3 * (abs(V_h(Q)).^3)...
        + 1/4 * (abs(V_h(Q)).^4);
 
-F_h = @(X) (X + X.^2 + X.^3);
-%F_h = @(X) (abs(X) + abs(X).^2 + abs(X).^3) * sign(X);
+F_h = @(X) (abs(X) + abs(X).^2 + abs(X).^3) * sign(X);
 F = @(Q) arrayfun(F_h, [ 0 , flip(diff(flip(Q),1,2)) ]) - ...
          arrayfun(F_h, [ -diff(Q,1,2) , 0 ]);
 
 % DEFINE H
 H(1,:) = 1/2 * P.^2 + V(Q);
 tic
-[EC_P,EC_Q,EC_H] = euler_cromer(P,Q,F,V,H,1,e,nstep, ...
-                                [n_particles, length]);
-[LF_P,LF_Q,LF_H] = leapfrog(P,Q,F,V,H,1,e,nstep, ...
-                                [n_particles, length]);
-[RK2_P,RK2_Q,RK2_H] = RK2(P,Q,F,V,H,1,e,nstep, ...
-                                [n_particles, length]);
+[EC_P,EC_Q,EC_H] = euler_cromer(P,Q,F,V,H,1,e,nstep);
+[LF_P,LF_Q,LF_H] = leapfrog(P,Q,F,V,H,1,e,nstep);
+[RK2_P,RK2_Q,RK2_H] = RK2(P,Q,F,V,H,1,e,nstep);
 toc
 
 %% ENERGY
@@ -48,8 +44,9 @@ ylabel('H');
 
 %% SIMULATION
 for i=1:10:nstep
-    scatter(EC_Q(i,1:10), 0, 'o');
-    xlim([0.5 10.5]);
+    string = 0:n_particles;
+    scatter(RK2_Q(i,1:10) + string(1:10), i, 'o');
+    xlim([-0.5 10.5]);
     pause(e);    
 end
 

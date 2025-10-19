@@ -22,18 +22,19 @@ end
 
 for t=1:nstep
     P(t+1,:) = P(t,:) + e * F(Q(t,:));
-    if NB
-        P(t+1,1) = 0;
-        P(t+1,NB(1)) = 0;
-    end
+    % if NB
+    %     P(t+1,1) = 0;
+    %     P(t+1,NB(1)) = 0;
+    % end
+
     Q(t+1,:) = Q(t,:) + e * P(t+1,:)/M; % Change P(i+1) to P(i)
                                      % for EC to Euler, respectively
     if NB
-        Q(t+1,1) = 1;
-        Q(t+1,NB(1)) = NB(2);
+        Q(t+1,1) = 0;
+        Q(t+1,NB(1)) = 0;
     end
     
-    H(t+1,:) = 1/2 * dot(P(t+1,:),P(t+1,:)) / M + V(Q(t+1,:));
+    H(t+1,:) = 1/2 * P(t+1,:).^2 / M + V(Q(t+1,:));
 end
 
 H = sum(H, 2);

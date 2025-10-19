@@ -47,7 +47,7 @@ for t=2:nstep
         P(t+1,NB(1)) = 0;
     end
 
-    H(t,:) = 1/2 * dot(P(t+1,:),P(t+1,:)) / M + V(Q(t,:));
+    H(t,:) = 1/2 * P(t+1,:).^2 / M + V(Q(t,:));
 end
 
 % Last half step
@@ -61,7 +61,7 @@ end
 
 % P(nstep+2) = P(nstep+1) + e/2 * F(Q(nstep+1)); % not needed, since
                                                  % nstep+2 exceeds range
-H(nstep+1,:) = 1/2 * dot(P(nstep+1,:), P(nstep+1,:)) / M + V(Q(nstep+1,:));
+H(nstep+1,:) = 1/2 * P(t+1,:).^2 / M + V(Q(nstep+1,:));
 
 H = sum(H, 2);
 
