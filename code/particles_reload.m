@@ -1,14 +1,13 @@
 clear;
 
-% TIME STUFF
+% TIME PARAMS
 e = 1e-3;
 tf = 10;
 nstep = tf/e;
 T = 0:e:tf;
 
 % CONSTANTS
-n_particles = 500; % number of particles
-length = 500; % length of string
+n_particles = 750; % number of particles
 
 % DEFINE P & Q
 Q(1,:) = zeros(1,n_particles);
@@ -78,7 +77,7 @@ xlabel('t');
 ylabel('v^2');
 
 %% 5. HISTOGRAM
-for t=1:1:nstep
+for t=1:10:nstep
     h = RK2_P(t,:).^2;
     histogram(h,15);
     % xlim([0 0.5]);
