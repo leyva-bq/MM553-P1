@@ -1,6 +1,6 @@
 clear;
 
-% TIME STUFF
+% TIME PARAMS
 e = 1e-3;
 tf = 5;
 nstep = tf/e;
