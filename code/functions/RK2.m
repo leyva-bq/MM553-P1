@@ -42,8 +42,8 @@ for t=1:nstep
     
     % Check boundary
     if NB
-        Q(t+1,1) = 1;
-        Q(t+1,NB(1)) = NB(2);
+        Q(t+1,1) = 0;
+        Q(t+1,NB(1)) = 0;
     end
     
     H(t+1,:) = 1/2 * P(t+1,:).^2 / M + V(Q(t+1,:));

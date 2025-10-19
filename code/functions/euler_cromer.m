@@ -22,10 +22,10 @@ end
 
 for t=1:nstep
     P(t+1,:) = P(t,:) + e * F(Q(t,:));
-    % if NB
-    %     P(t+1,1) = 0;
-    %     P(t+1,NB(1)) = 0;
-    % end
+    if NB
+        P(t+1,1) = 0;
+        P(t+1,NB(1)) = 0;
+    end
 
     Q(t+1,:) = Q(t,:) + e * P(t+1,:)/M; % Change P(i+1) to P(i)
                                      % for EC to Euler, respectively

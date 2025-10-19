@@ -35,8 +35,8 @@ for t=2:nstep
 
     % Check boundary
     if NB
-        Q(t,1) = 1;
-        Q(t,NB(1)) = NB(2);
+        Q(t,1) = 0;
+        Q(t,NB(1)) = 0;
     end
 
     P(t+1,:) = P(t,:) + e * F(Q(t,:));
@@ -55,8 +55,8 @@ Q(nstep+1,:) = Q(nstep,:) + e * P(nstep+1,:)/M;
 
 % Check boundary
 if NB
-    Q(nstep,1) = 1;
-    Q(nstep,NB(1)) = NB(2);
+    Q(nstep,1) = 0;
+    Q(nstep,NB(1)) = 0;
 end
 
 % P(nstep+2) = P(nstep+1) + e/2 * F(Q(nstep+1)); % not needed, since
