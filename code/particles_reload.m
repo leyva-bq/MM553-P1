@@ -79,7 +79,7 @@ ylabel('v^2');
 %% 5. HISTOGRAM
 for t=1:10:nstep
     h = RK2_P(t,:).^2;
-    histogram(h,15);
+    histogram(h);
     % xlim([0 0.5]);
     %ylim([0 200]);
     title(['Histogram of velocity squared over time (t = ' num2str(t*e) ')'])
@@ -87,13 +87,23 @@ for t=1:10:nstep
 end
 
 %% MAXWELL
-m = 1;
-k = 1.38e-20;
-temp = 100;
-v = RK2_P(100,:);
+for t=1:nstep
 
-for temp=0:1000:10e20
-    h = sqrt(m / (2*pi*k*temp)) * exp(-m*v.^2 / (2*k*temp));
-    scatter(v.^2,h);
+    h = RK2_P(t,:);
+    histogram(h);
+    pause(e);
+end
+
+pause;
+%%
+m = 10;
+kT = 1e-10;
+% v = 0:0.01:range;
+v = P;
+
+dkT = 10;
+for kT=dkT:dkT:1e5
+    mb_dist = sqrt(m / (2*pi*kT)) * exp(-m*v.^2 / (2*kT));
+    scatter(v, mb_dist);
     pause(e);
 end
