@@ -46,7 +46,7 @@ ylabel('H');
 %% SIMULATION
 for i=1:100:nstep
     string = 0:n_particles;
-    scatter(RK2_Q(i,1:10) + string(1:10), i, 'o');
+    scatter(RK2_Q(i,1:10) + string(1:10), 0, 'o');
     xlim([-0.5 10.5]);
     pause(e);    
 end
