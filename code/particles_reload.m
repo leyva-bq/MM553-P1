@@ -76,34 +76,21 @@ title('Average velocity squared over time (v^2(t) vs t)');
 xlabel('t');
 ylabel('v^2');
 
-%% 5. HISTOGRAM
-for t=1:10:nstep
-    h = RK2_P(t,:).^2;
-    histogram(h);
-    % xlim([0 0.5]);
-    %ylim([0 200]);
-    title(['Histogram of velocity squared over time (t = ' num2str(t*e) ')'])
-    pause(e);
-end
+%% 5.1 HISTOGRAM
+t = 6201;
+v = RK2_P(t,:);
 
-%% MAXWELL
-for t=1:nstep
+yyaxis left
+histogram(v);
+title('Histogram of velocity and MB probability distribution (t = 6.201)');
+xlabel('Velocity (v)');
+ylabel('Probability density');
 
-    h = RK2_P(t,:);
-    histogram(h);
-    pause(e);
-end
-
-pause;
-%%
-m = 10;
-kT = 1e-10;
-% v = 0:0.01:range;
-v = P;
-
-dkT = 10;
-for kT=dkT:dkT:1e5
-    mb_dist = sqrt(m / (2*pi*kT)) * exp(-m*v.^2 / (2*kT));
-    scatter(v, mb_dist);
-    pause(e);
-end
+yyaxis right
+m = 1;
+kT = mean(v.^2) * m;
+v_sorted = sort(v);
+mb_dist = sqrt(m / (2*pi*kT)) * exp(-m*v_sorted.^2 / (2*kT));
+plot(v_sorted, mb_dist, 'LineWidth', 3);
+ylabel('MB fit');
+legend('Histogram', 'MB distribution');
